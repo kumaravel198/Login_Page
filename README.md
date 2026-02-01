@@ -43,8 +43,6 @@ project-folder/
 
 ### Step 1: Download Project
 
-You can either:
-
 Clone using Git:
 
 git clone <your-repository-link>
@@ -63,8 +61,7 @@ Go inside the folder where index.html is located.
 
 ### Step 3: Run Project
 
-Double click:
-
+Double click:<https://697f9ea6f84302000867f248--stupendous-lamington-9b7319.netlify.app/>
 index.html
 
 OR
