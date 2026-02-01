@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Signup 3D Flip with Pie Chart</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+  <style>
+    .scene {
+      perspective: 2000px;
+    }
+
+    .card-3d {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 1s ease;
+      position: relative;
+    }
+
+    /* Animated Sky Gradient Pattern */
+    .sky-bg {
+      background: linear-gradient(135deg, #0a1a3f, #0f3460, #3a6ea5, #77b5fe);
+      background-size: 400% 400%;
+      animation: skyShift 18s ease infinite;
+    }
+
+    @keyframes skyShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      25% {
+        background-position: 50% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      75% {
+        background-position: 50% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .card-3d.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    .grad-animate {
+      background: linear-gradient(135deg, #152e72, #2259b1, #310e66);
+      background-size: 300% 300%;
+      animation: bgShift 10s ease infinite;
+    }
+
+    @keyframes bgShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .light .bg-slate-900 {
+      background-color: #f3f4f6 !important;
+    }
+
+    .light .text-white {
+      color: #111 !important;
+    }
+
+    .light .bg-slate-800 {
+      background-color: #e5e7eb !important;
+      color: #111 !important;
+    }
+
+    .light input {
+      border-color: #cbd5e1 !important;
+    }
+  </style>
+</head>
+
+<body id="body" class="min-h-screen flex items-center justify-center transition-all sky-bg">
+
+
+  <button id="themeToggle"
+    class="absolute top-6 right-6 px-4 py-2 rounded-full bg-slate-800 hover:bg-indigo-500 text-white shadow transition">
+    🌙
+  </button>
+
+  <div
+    class="scene w-[95vw] md:w-[90vw] max-w-6xl h-[85vh] md:h-[90vh] rounded-3xl overflow-hidden shadow-2xl bg-slate-950">
+    <div id="auth-card" class="card-3d">
+
+      <!-- ---------------- FRONT (LOGIN) ---------------- -->
+      <div class="card-face card-front flex">
+
+        <!-- Pie Chart Panel (Hidden on Mobile) -->
+        <div class="hidden md:flex md:w-1/2 grad-animate p-6 h-full flex-col items-center justify-center">
+
+          <h1 class="text-white text-5xl font-bold mt-12 pt-15 drop-shadow-xl tracking-wide">
+            Welcome
+          </h1>
+
+          <canvas id="loginPie" class="w-full h-full"></canvas>
+        </div>
+
+        <!-- Login Form -->
+        <div class="w-full md:w-1/2 bg-slate-900 p-6 md:p-10 flex items-center justify-center">
+          <div class="w-full max-w-md">
+            <h1 class="text-3xl font-bold text-white text-center mb-2">Welcome back</h1>
+            <p class="text-slate-400 text-center mb-6">Log in to continue</p>
+
+            <form id="loginForm" class="space-y-4">
+              <input id="loginEmail" type="email"
+                class="w-full p-3 rounded bg-slate-800 border border-slate-700 text-white" placeholder="Email" />
+              <p id="loginEmailError" class="text-red-400 text-xs hidden"></p>
+
+              <input id="loginPassword" type="password"
+                class="w-full p-3 rounded bg-slate-800 border border-slate-700 text-white" placeholder="Password" />
+              <p id="loginPasswordError" class="text-red-400 text-xs hidden"></p>
+
+              <button class="w-full bg-indigo-500 py-3 rounded text-white active:scale-95 transition-transform">Log
+                in</button>
+            </form>
+
+            <p class="text-slate-400 text-xs mt-4 text-center">
+              Don't have an account?
+              <button id="openSignup" class="text-indigo-400 underline">Sign up</button>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------------- BACK (SIGNUP) ---------------- -->
+      <div class="card-face card-back flex">
+
+        <!-- Signup Form -->
+        <div class="w-full md:w-1/2 bg-slate-900 p-6 md:p-10 flex items-center justify-center">
+          <div class="w-full max-w-md">
+
+            <h1 class="text-3xl font-bold text-white text-center mb-2">Create account</h1>
+            <p class="text-slate-300 text-center mb-6">Join our dashboard</p>
+
+            <form id="signupForm" class="space-y-4">
+              <input id="signupName" class="w-full p-3 rounded bg-slate-800 border border-slate-700 text-white"
+                placeholder="Full name" />
+              <p id="signupNameError" class="text-red-400 text-xs hidden"></p>
+
+              <input id="signupEmail" class="w-full p-3 rounded bg-slate-800 border border-slate-700 text-white"
+                placeholder="Email" />
+              <p id="signupEmailError" class="text-red-400 text-xs hidden"></p>
+
+              <input id="signupPassword" type="password"
+                class="w-full p-3 rounded bg-slate-800 border border-slate-700 text-white" placeholder="Password" />
+              <p id="signupPasswordError" class="text-red-400 text-xs hidden"></p>
+
+              <input id="signupConfirm" type="password"
+                class="w-full p-3 rounded bg-slate-800 border border-slate-700 text-white"
+                placeholder="Confirm password" />
+              <p id="signupConfirmError" class="text-red-400 text-xs hidden"></p>
+
+              <button class="w-full bg-indigo-500 py-3 rounded text-white active:scale-95 transition-transform">Sign
+                up</button>
+            </form>
+
+            <p class="text-slate-400 text-xs mt-4 text-center">
+              Already have an account?
+              <button id="openLogin" class="text-indigo-400 underline">Log in</button>
+            </p>
+
+          </div>
+        </div>
+
+        <!-- Signup Bar Chart (Hidden on Mobile) -->
+        <div class="hidden md:flex md:w-1/2 grad-animate p-6 h-full flex items-center justify-center">
+          <canvas id="signupChart" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* ---------------- THEME ---------------- */
+    const body = document.getElementById("body");
+    const themeBtn = document.getElementById("themeToggle");
+
+    if (localStorage.getItem("theme") === "light") {
+      body.classList.add("light");
+      themeBtn.textContent = "☀️";
+    }
+
+    themeBtn.onclick = () => {
+      body.classList.toggle("light");
+      let mode = body.classList.contains("light") ? "light" : "dark";
+      localStorage.setItem("theme", mode);
+      themeBtn.textContent = mode === "light" ? "☀️" : "🌙";
+    };
+
+    /* ---------------- FLIP ---------------- */
+    const card = document.getElementById("auth-card");
+    openSignup.onclick = () => card.classList.add("is-flipped");
+    openLogin.onclick = () => card.classList.remove("is-flipped");
+
+    /* ---------------- VALIDATION HELPERS ---------------- */
+    function showError(input, box, msg) {
+      box.textContent = msg;
+      box.classList.remove("hidden");
+      input.classList.add("border-red-500");
+    }
+    function clearError(input, box) {
+      box.classList.add("hidden");
+      input.classList.remove("border-red-500");
+    }
+
+    /* ---------------- LOGIN VALIDATION ---------------- */
+    loginForm.onsubmit = e => {
+      e.preventDefault();
+      let ok = true;
+
+      if (!loginEmail.value.includes("@")) {
+        showError(loginEmail, loginEmailError, "Invalid email");
+        ok = false;
+      } else clearError(loginEmail, loginEmailError);
+
+      if (loginPassword.value.length < 6) {
+        showError(loginPassword, loginPasswordError, "Password must be 6+ chars");
+        ok = false;
+      } else clearError(loginPassword, loginPasswordError);
+
+      if (ok) alert("Login successful!");
+    };
+
+    /* ---------------- SIGNUP VALIDATION ---------------- */
+    signupForm.onsubmit = e => {
+      e.preventDefault();
+      let ok = true;
+
+      if (!signupName.value.trim()) {
+        showError(signupName, signupNameError, "Name required");
+        ok = false;
+      } else clearError(signupName, signupNameError);
+
+      if (!signupEmail.value.includes("@")) {
+        showError(signupEmail, signupEmailError, "Invalid email");
+        ok = false;
+      } else clearError(signupEmail, signupEmailError);
+
+      if (signupPassword.value.length < 6) {
+        showError(signupPassword, signupPasswordError, "Password too short");
+        ok = false;
+      } else clearError(signupPassword, signupPasswordError);
+
+      if (signupConfirm.value !== signupPassword.value) {
+        showError(signupConfirm, signupConfirmError, "Passwords do not match");
+        ok = false;
+      } else clearError(signupConfirm, signupConfirmError);
+
+      if (ok) alert("Signup successful!");
+    };
+
+    /* ---------------- PIE CHART ---------------- */
+    const pieCtx = document.getElementById("loginPie").getContext("2d");
+
+    const pieColors = [
+      "rgba(129,140,248,0.9)", "rgba(96,165,250,0.9)", "rgba(56,189,248,0.9)",
+      "rgba(45,212,191,0.9)", "rgba(74,222,128,0.9)", "rgba(250,204,21,0.9)",
+      "rgba(249,115,22,0.9)", "rgba(244,114,182,0.9)", "rgba(167,139,250,0.9)",
+      "rgba(125,211,252,0.9)", "rgba(52,211,153,0.9)", "rgba(190,242,100,0.9)",
+      "rgba(250,250,109,0.9)", "rgba(253,186,116,0.9)", "rgba(251,113,133,0.9)",
+      "rgba(236,72,153,0.9)", "rgba(147,51,234,0.9)", "rgba(59,130,246,0.9)",
+      "rgba(34,197,94,0.9)", "rgba(239,68,68,0.9)"
+    ];
+
+    const pieLabels = Array.from({ length: 20 }, (_, i) => `Section ${i + 1}`);
+    let pieValues = Array.from({ length: 20 }, () => Math.floor(Math.random() * 20) + 5);
+
+    let loginPie = new Chart(pieCtx, {
+      type: "pie",
+      data: {
+        labels: pieLabels,
+        datasets: [{
+          data: pieValues,
+          backgroundColor: pieColors,
+          borderWidth: 2,
+          borderColor: "rgba(255,255,255,0.5)"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+          legend: { display: false },
+
+          datalabels: {
+            color: "#fff",
+            font: { weight: "bold", size: 14 },
+
+            /* glowing effect */
+            textStrokeColor: "#white",
+            textStrokeWidth: 0.5,
+            textShadowBlur: 10,
+            textShadowColor: "rgba(255,255,255,0.9)",
+
+            formatter: (value, ctx) => {
+              let dataset = ctx.chart.data.datasets[0].data;
+              let total = dataset.reduce((a, b) => a + b, 0);
+              let percent = ((value / total) * 100).toFixed(1);
+              return percent + "%";
+            }
+          }
+        },
+
+        animation: { duration: 900, easing: "easeInOutQuart" }
+      },
+
+      plugins: [ChartDataLabels]
+    });
+
+    setInterval(() => {
+      loginPie.data.datasets[0].data = loginPie.data.datasets[0].data.map(v => {
+        let change = Math.random() * 6 - 3;
+        return Math.max(3, Math.min(v + change, 35));
+      });
+      loginPie.update();
+    }, 1100);
+
+    /* ---------------- SIGNUP BAR CHART ---------------- */
+    const signupChart = new Chart(document.getElementById("signupChart"), {
+      type: "bar",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        datasets: [{
+          data: [5, 9, 13, 20, 25, 30],
+          backgroundColor: [
+            "#818cf8", "#60a5fa", "#34d399",
+            "#facc15", "#f87171", "#f472b6"
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+          datalabels: {
+            anchor: "end",
+            align: "top",
+            color: "#fff",
+            font: { weight: "bold", size: 14 },
+
+            /* glowing effect */
+            textStrokeColor: "#white",
+            textStrokeWidth: 0.5,
+            textShadowBlur: 10,
+            textShadowColor: "rgba(255,255,255,0.9)",
+
+            formatter: (value, ctx) => {
+              const dataset = ctx.chart.data.datasets[0].data;
+              const total = dataset.reduce((a, b) => a + b, 0);
+              const percent = ((value / total) * 100).toFixed(1);
+              return percent + "%";
+            }
+          }
+        }
+      },
+
+      plugins: [ChartDataLabels]
+    });
+
+    setInterval(() => {
+      signupChart.data.datasets[0].data = signupChart.data.datasets[0].data.map(v => {
+        v += Math.random() * 4 - 2;
+        return Math.max(0, v);
+      });
+      signupChart.update();
+    }, 900);
+  </script>
+
+
+</body>
+
+</html>
