@@ -61,8 +61,8 @@ Go inside the folder where index.html is located.
 
 ### Step 3: Run Project
 
-Double click:<https://697f9ea6f84302000867f248--stupendous-lamington-9b7319.netlify.app/>
-index.html
+To click:<https://697f9ea6f84302000867f248--stupendous-lamington-9b7319.netlify.app/>
+
 
 OR
 
